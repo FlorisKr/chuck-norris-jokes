@@ -27,5 +27,6 @@ pnpm dev
 | `pnpm build`        | Type-check and build for production to `dist/` |
 | `pnpm preview`      | Serve the production build locally             |
 | `pnpm lint`         | Lint the codebase with Oxlint                  |
+| `pnpm typecheck`    | Type-check the codebase                        |
 | `pnpm format`       | Format the codebase with oxfmt                 |
 | `pnpm format:check` | Check formatting without writing changes       |
