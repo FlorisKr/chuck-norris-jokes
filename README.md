@@ -19,6 +19,10 @@ pnpm install
 pnpm dev
 ```
 
+## Git hooks
+
+[Husky](https://typicode.github.io/husky/) installs a `pre-push` hook on `pnpm install`. It runs the format check, lint and type-check, so problems show up before CI runs them on the pull request.
+
 ## Scripts
 
 | Command             | Description                                    |
