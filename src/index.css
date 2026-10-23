@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #fff;
+  --color-foreground: #14181b;
+  --color-secondary: #167a9a;
+  --color-accent: #f85204;
+  --color-line: #e3e6e8;
+}
+
+@layer base {
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background: #111618;
+      --color-foreground: #f1f4f5;
+      --color-line: #26313a;
+      --color-accent: #ff6a1f;
+      --color-secondary: #4fb3d1;
+    }
+  }
+
+  :root {
+    color-scheme: light dark;
+  }
+
+  body {
+    @apply min-h-svh bg-background font-sans text-foreground antialiased;
+  }
+}
