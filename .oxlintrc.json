@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc", "import", "jsx-a11y"],
+  "plugins": ["react", "typescript", "oxc", "import", "jsx-a11y", "vitest"],
   "options": {
     "typeAware": true
   },
@@ -13,7 +13,10 @@
     "react/only-export-components": ["error", { "allowConstantExport": true }],
     "react/react-in-jsx-scope": "off",
     "import/no-default-export": "error",
-    "import/no-unassigned-import": ["error", { "allow": ["**/*.css"] }],
+    "import/no-unassigned-import": [
+      "error",
+      { "allow": ["**/*.css", "@testing-library/jest-dom/vitest"] }
+    ],
     "typescript/no-explicit-any": "error",
     "typescript/no-unsafe-argument": "error",
     "typescript/no-unsafe-assignment": "error",
