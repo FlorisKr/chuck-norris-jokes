@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #fff;
+  --color-background: #f1f3f4;
+  --color-surface: #fff;
   --color-foreground: #14181b;
   --color-secondary: #167a9a;
   --color-accent: #f85204;
@@ -12,6 +13,7 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --color-background: #111618;
+      --color-surface: #182024;
       --color-foreground: #f1f4f5;
       --color-line: #26313a;
       --color-accent: #ff6a1f;

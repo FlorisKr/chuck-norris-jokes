@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 
 import { fetchRandomJokes } from "../api/jokes";
 
-const JOKE_COUNT = 10;
+export const JOKE_COUNT = 10;
 
 export const jokesQueryOptions = queryOptions({
   queryKey: ["jokes"],
