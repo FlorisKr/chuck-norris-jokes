@@ -1,7 +1,6 @@
 import { type Joke, JokeSchema } from "../schemas/joke";
 
 const RANDOM_JOKE_URL = "https://api.chucknorris.io/jokes/random";
-const SPARE_JOKES = 2;
 
 export async function fetchRandomJoke(signal?: AbortSignal): Promise<Joke> {
   const response = await fetch(RANDOM_JOKE_URL, { signal });
@@ -19,20 +18,29 @@ export async function fetchRandomJoke(signal?: AbortSignal): Promise<Joke> {
   return result.data;
 }
 
+function fetchJokes(amount: number, signal?: AbortSignal): Promise<Joke[]> {
+  return Promise.all(Array.from({ length: amount }, () => fetchRandomJoke(signal)));
+}
+
+function uniqueById(jokes: Joke[]): Joke[] {
+  return [...new Map(jokes.map((joke) => [joke.id, joke])).values()];
+}
+
 /**
  * Fetches `count` unique jokes. The API only returns one random joke per request,
- * so all requests run in parallel. A couple of spare jokes absorb duplicates, which has a small chance.
+ * so all requests run in parallel. Duplicates could happen, so missing jokes are fetched once more to top up so no more duplicates exist.
  * Fails as a whole if any request fails.
  */
 export async function fetchRandomJokes(count: number, signal?: AbortSignal): Promise<Joke[]> {
-  const jokes = await Promise.all(
-    Array.from({ length: count + SPARE_JOKES }, () => fetchRandomJoke(signal)),
-  );
-  const uniqueJokes = [...new Map(jokes.map((joke) => [joke.id, joke])).values()];
+  let jokes = uniqueById(await fetchJokes(count, signal));
 
-  if (uniqueJokes.length < count) {
+  if (jokes.length < count) {
+    jokes = uniqueById([...jokes, ...(await fetchJokes(count - jokes.length, signal))]);
+  }
+
+  if (jokes.length < count) {
     throw new Error(`Could not load ${count} unique jokes`);
   }
 
-  return uniqueJokes.slice(0, count);
+  return jokes;
 }

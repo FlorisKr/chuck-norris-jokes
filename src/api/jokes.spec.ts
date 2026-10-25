@@ -18,7 +18,7 @@ function respondWithJokeIds(ids: string[]) {
 
 describe("fetchRandomJokes", () => {
   it("returns the requested number of unique jokes", async () => {
-    respondWithJokeIds(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"]);
+    respondWithJokeIds(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]);
 
     const jokes = await fetchRandomJokes(10);
 
