@@ -8,7 +8,8 @@ A React client for the [Chuck Norris jokes API](https://api.chucknorris.io/).
 - [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vite.dev/)
 - [Tailwind CSS 4](https://tailwindcss.com/)
-- [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) for unit and integration tests
+- [TanStack Query](https://tanstack.com/query) for data fetching and [Zod](https://zod.dev/) for validating API data
+- [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) for unit and integration tests, with [MSW](https://mswjs.io/) to fake the API
 - [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [oxfmt](https://oxc.rs/docs/guide/usage/formatter) for linting and formatting
 
 ## Getting started
