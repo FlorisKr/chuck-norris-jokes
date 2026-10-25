@@ -76,6 +76,7 @@ describe("Given JokeList", () => {
         const button = screen.getByRole("button", { name: "Trying again…" });
         expect(button).toHaveAttribute("aria-disabled", "true");
         expect(button).toHaveFocus();
+        await screen.findByRole("button", { name: "Try again" });
       });
 
       describe("when the API still fails", () => {
