@@ -7,6 +7,18 @@
   --color-secondary: #167a9a;
   --color-accent: #f85204;
   --color-line: #e3e6e8;
+
+  /* Duration is set inline from the refresh interval */
+  --animate-countdown: countdown linear infinite;
+
+  @keyframes countdown {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
 }
 
 @layer base {
