@@ -25,7 +25,8 @@
 
 ### Testing
 
-- [ ] Tests: New or changed behavior is covered
+- [ ] Unit tests: New or changed pure logic is covered in `*.spec.ts`
+- [ ] Integration tests: New or changed features are covered as users experience them in `*.integration.spec.ts(x)`
 
 ### Documentation
 

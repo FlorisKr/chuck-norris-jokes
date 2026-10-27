@@ -1,6 +1,6 @@
 import { type Joke, JokeSchema } from "../schemas/joke";
 
-const RANDOM_JOKE_URL = "https://api.chucknorris.io/jokes/random";
+export const RANDOM_JOKE_URL = "https://api.chucknorris.io/jokes/random";
 const MAX_FETCH_ATTEMPTS = 3;
 
 export async function fetchRandomJoke(signal?: AbortSignal): Promise<Joke> {
