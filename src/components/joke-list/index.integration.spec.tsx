@@ -3,31 +3,21 @@ import { type UserEvent, userEvent } from "@testing-library/user-event";
 import { delay, http, HttpResponse } from "msw";
 
 import { JokeList } from ".";
+import { RANDOM_JOKE_URL } from "../../api/jokes";
+import { countOfJokeRequests } from "../../mocks/handlers";
 import { server } from "../../mocks/server";
 import { renderWithQueryClient } from "../../tests/render";
 
-const RANDOM_JOKE_URL = "https://api.chucknorris.io/jokes/random";
-
-function respondWithJokes() {
+function respondWithError() {
   let request = 0;
   server.use(
-    http.get(RANDOM_JOKE_URL, () => {
+    http.get(RANDOM_JOKE_URL, async () => {
+      await delay(20);
       request += 1;
-      return HttpResponse.json({ id: `joke-${request}`, value: `Joke ${request}` });
-    }),
-  );
-  return () => request;
-}
-
-function respondWithFailingRefreshes() {
-  let failedRequests = 0;
-  server.use(
-    http.get(RANDOM_JOKE_URL, () => {
-      failedRequests += 1;
       return new HttpResponse(null, { status: 500 });
     }),
   );
-  return () => failedRequests;
+  return () => request;
 }
 
 function respondWithHangingRequests() {
@@ -58,19 +48,9 @@ async function waitFiveSeconds() {
   await act(() => vi.advanceTimersByTimeAsync(5000));
 }
 
-function respondWithError() {
-  server.use(
-    http.get(RANDOM_JOKE_URL, async () => {
-      await delay(20);
-      return new HttpResponse(null, { status: 500 });
-    }),
-  );
-}
-
 describe("Given JokeList", () => {
   describe("when the jokes are still loading", () => {
     beforeEach(() => {
-      respondWithJokes();
       renderWithQueryClient(<JokeList />);
     });
 
@@ -80,10 +60,7 @@ describe("Given JokeList", () => {
   });
 
   describe("when the API returns jokes", () => {
-    let requestCount: () => number;
-
     beforeEach(() => {
-      requestCount = respondWithJokes();
       renderWithQueryClient(<JokeList />);
     });
 
@@ -138,12 +115,12 @@ describe("Given JokeList", () => {
         });
 
         it("then stops fetching new jokes", async () => {
-          const requestsWhenTurnedOff = requestCount();
+          const requestsWhenTurnedOff = countOfJokeRequests();
 
           await waitFiveSeconds();
           await waitFiveSeconds();
 
-          expect(requestCount()).toBe(requestsWhenTurnedOff);
+          expect(countOfJokeRequests()).toBe(requestsWhenTurnedOff);
         });
       });
 
@@ -156,14 +133,21 @@ describe("Given JokeList", () => {
           Reflect.deleteProperty(document, "visibilityState");
         });
 
-        it("then stops fetching new jokes", async () => {
-          const requestsWhenHidden = requestCount();
-
+        it("then adds no new jokes", async () => {
           await waitFiveSeconds();
           await waitFiveSeconds();
 
-          expect(requestCount()).toBe(requestsWhenHidden);
+          expect(screen.queryByText("Joke 11")).not.toBeInTheDocument();
           expect(jokeTexts()[0]).toBe("Joke 1");
+        });
+
+        it("then stops fetching new jokes", async () => {
+          const requestsWhenHidden = countOfJokeRequests();
+
+          await waitFiveSeconds();
+          await waitFiveSeconds();
+
+          expect(countOfJokeRequests()).toBe(requestsWhenHidden);
         });
 
         describe("when the user comes back", () => {
@@ -210,15 +194,21 @@ describe("Given JokeList", () => {
         let failedRequests: () => number;
 
         beforeEach(() => {
-          failedRequests = respondWithFailingRefreshes();
+          failedRequests = respondWithError();
         });
 
-        it("then keeps the current jokes without showing an error", async () => {
+        it("then keeps the current jokes", async () => {
           await waitFiveSeconds();
 
           await waitFor(() => expect(failedRequests()).toBeGreaterThan(0));
           expect(jokeTexts()).toHaveLength(10);
           expect(jokeTexts()[0]).toBe("Joke 1");
+        });
+
+        it("then shows no error", async () => {
+          await waitFiveSeconds();
+
+          await waitFor(() => expect(failedRequests()).toBeGreaterThan(0));
           expect(screen.queryByRole("alert")).not.toBeInTheDocument();
         });
       });
@@ -265,7 +255,7 @@ describe("Given JokeList", () => {
 
       describe("when the API recovers", () => {
         beforeEach(async () => {
-          respondWithJokes();
+          server.resetHandlers();
           await user.click(screen.getByRole("button", { name: "Try again" }));
         });
 
