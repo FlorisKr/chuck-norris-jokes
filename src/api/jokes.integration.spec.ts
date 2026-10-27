@@ -23,6 +23,18 @@ function respondWithMalformedJoke() {
   server.use(http.get(RANDOM_JOKE_URL, () => HttpResponse.json({ joke: "No id or value" })));
 }
 
+function respondWithErrorOnSecondRequest() {
+  let request = 0;
+  server.use(
+    http.get(RANDOM_JOKE_URL, () => {
+      request += 1;
+      return request === 2
+        ? new HttpResponse(null, { status: 500 })
+        : HttpResponse.json(buildJoke(String(request)));
+    }),
+  );
+}
+
 describe("Given fetchRandomJoke", () => {
   describe("when the API returns an unexpected response", () => {
     it("then fails with an unexpected response error", async () => {
@@ -77,15 +89,7 @@ describe("Given fetchRandomJokes", () => {
 
   describe("when one request fails", () => {
     it("then fails as a whole", async () => {
-      let request = 0;
-      server.use(
-        http.get(RANDOM_JOKE_URL, () => {
-          request += 1;
-          return request === 2
-            ? new HttpResponse(null, { status: 500 })
-            : HttpResponse.json(buildJoke(String(request)));
-        }),
-      );
+      respondWithErrorOnSecondRequest();
 
       const result = fetchRandomJokes(3);
 

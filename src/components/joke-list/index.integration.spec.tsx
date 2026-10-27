@@ -1,4 +1,4 @@
-import { act, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { type UserEvent, userEvent } from "@testing-library/user-event";
 import { delay, http, HttpResponse } from "msw";
 
@@ -6,7 +6,11 @@ import { JokeList } from ".";
 import { RANDOM_JOKE_URL } from "../../api/jokes";
 import { countOfJokeRequests } from "../../mocks/handlers";
 import { server } from "../../mocks/server";
+import { JOKE_COUNT } from "../../queries/jokes";
 import { renderWithQueryClient } from "../../tests/render";
+import { REFRESH_INTERVAL_MS } from "./auto-refresh/use-auto-refresh";
+
+const NEXT_JOKE = `Joke ${JOKE_COUNT + 1}`;
 
 function respondWithError() {
   let request = 0;
@@ -31,6 +35,10 @@ function respondWithHangingRequests() {
   return signals;
 }
 
+function respondWithHappyPath() {
+  server.resetHandlers();
+}
+
 function jokeTexts() {
   return within(screen.getByRole("list", { name: "Jokes" }))
     .getAllByRole("listitem")
@@ -39,13 +47,11 @@ function jokeTexts() {
 
 function switchTab(visibility: DocumentVisibilityState) {
   Object.defineProperty(document, "visibilityState", { value: visibility, configurable: true });
-  act(() => {
-    document.dispatchEvent(new Event("visibilitychange"));
-  });
+  fireEvent(document, new Event("visibilitychange"));
 }
 
-async function waitFiveSeconds() {
-  await act(() => vi.advanceTimersByTimeAsync(5000));
+async function waitOneRefreshInterval() {
+  await act(() => vi.advanceTimersByTimeAsync(REFRESH_INTERVAL_MS));
 }
 
 describe("Given JokeList", () => {
@@ -54,8 +60,9 @@ describe("Given JokeList", () => {
       renderWithQueryClient(<JokeList />);
     });
 
-    it("then announces that jokes are loading", () => {
+    it("then announces that jokes are loading", async () => {
       expect(screen.getByRole("status")).toHaveTextContent("Loading jokes");
+      await screen.findByRole("list", { name: "Jokes" });
     });
   });
 
@@ -65,7 +72,7 @@ describe("Given JokeList", () => {
     });
 
     it("then shows 10 jokes", async () => {
-      expect(await screen.findAllByRole("listitem")).toHaveLength(10);
+      expect(await screen.findAllByRole("listitem")).toHaveLength(JOKE_COUNT);
       expect(screen.getByText("Joke 1")).toBeInTheDocument();
     });
 
@@ -88,17 +95,17 @@ describe("Given JokeList", () => {
       });
 
       it("then adds a new joke on top after 5 seconds", async () => {
-        await waitFiveSeconds();
+        await waitOneRefreshInterval();
 
-        expect(await screen.findByText("Joke 11")).toBeInTheDocument();
-        expect(jokeTexts()[0]).toBe("Joke 11");
+        expect(await screen.findByText(NEXT_JOKE)).toBeInTheDocument();
+        expect(jokeTexts()[0]).toBe(NEXT_JOKE);
       });
 
       it("then keeps the list at 10 jokes", async () => {
-        await waitFiveSeconds();
+        await waitOneRefreshInterval();
 
-        await screen.findByText("Joke 11");
-        expect(jokeTexts()).toHaveLength(10);
+        await screen.findByText(NEXT_JOKE);
+        expect(jokeTexts()).toHaveLength(JOKE_COUNT);
       });
 
       describe("when the user turns auto-refresh off again", () => {
@@ -107,18 +114,18 @@ describe("Given JokeList", () => {
         });
 
         it("then adds no new jokes", async () => {
-          await waitFiveSeconds();
-          await waitFiveSeconds();
+          await waitOneRefreshInterval();
+          await waitOneRefreshInterval();
 
-          expect(screen.queryByText("Joke 11")).not.toBeInTheDocument();
+          expect(screen.queryByText(NEXT_JOKE)).not.toBeInTheDocument();
           expect(jokeTexts()[0]).toBe("Joke 1");
         });
 
         it("then stops fetching new jokes", async () => {
           const requestsWhenTurnedOff = countOfJokeRequests();
 
-          await waitFiveSeconds();
-          await waitFiveSeconds();
+          await waitOneRefreshInterval();
+          await waitOneRefreshInterval();
 
           expect(countOfJokeRequests()).toBe(requestsWhenTurnedOff);
         });
@@ -134,18 +141,18 @@ describe("Given JokeList", () => {
         });
 
         it("then adds no new jokes", async () => {
-          await waitFiveSeconds();
-          await waitFiveSeconds();
+          await waitOneRefreshInterval();
+          await waitOneRefreshInterval();
 
-          expect(screen.queryByText("Joke 11")).not.toBeInTheDocument();
+          expect(screen.queryByText(NEXT_JOKE)).not.toBeInTheDocument();
           expect(jokeTexts()[0]).toBe("Joke 1");
         });
 
         it("then stops fetching new jokes", async () => {
           const requestsWhenHidden = countOfJokeRequests();
 
-          await waitFiveSeconds();
-          await waitFiveSeconds();
+          await waitOneRefreshInterval();
+          await waitOneRefreshInterval();
 
           expect(countOfJokeRequests()).toBe(requestsWhenHidden);
         });
@@ -156,10 +163,10 @@ describe("Given JokeList", () => {
           });
 
           it("then adds a new joke on top after 5 seconds", async () => {
-            await waitFiveSeconds();
+            await waitOneRefreshInterval();
 
-            expect(await screen.findByText("Joke 11")).toBeInTheDocument();
-            expect(jokeTexts()[0]).toBe("Joke 11");
+            expect(await screen.findByText(NEXT_JOKE)).toBeInTheDocument();
+            expect(jokeTexts()[0]).toBe(NEXT_JOKE);
           });
         });
       });
@@ -169,12 +176,12 @@ describe("Given JokeList", () => {
 
         beforeEach(async () => {
           signals = respondWithHangingRequests();
-          await waitFiveSeconds();
+          await waitOneRefreshInterval();
           await vi.waitUntil(() => signals.length === 1);
         });
 
         it("then waits for it instead of starting another request", async () => {
-          await waitFiveSeconds();
+          await waitOneRefreshInterval();
 
           expect(signals).toHaveLength(1);
         });
@@ -198,15 +205,15 @@ describe("Given JokeList", () => {
         });
 
         it("then keeps the current jokes", async () => {
-          await waitFiveSeconds();
+          await waitOneRefreshInterval();
 
           await waitFor(() => expect(failedRequests()).toBeGreaterThan(0));
-          expect(jokeTexts()).toHaveLength(10);
+          expect(jokeTexts()).toHaveLength(JOKE_COUNT);
           expect(jokeTexts()[0]).toBe("Joke 1");
         });
 
         it("then shows no error", async () => {
-          await waitFiveSeconds();
+          await waitOneRefreshInterval();
 
           await waitFor(() => expect(failedRequests()).toBeGreaterThan(0));
           expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -222,8 +229,11 @@ describe("Given JokeList", () => {
       await screen.findByRole("alert");
     });
 
-    it("then shows an error with a retry button", () => {
+    it("then shows an error", () => {
       expect(screen.getByRole("alert")).toHaveTextContent("Couldn't load jokes");
+    });
+
+    it("then offers to try again", () => {
       expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
     });
 
@@ -234,13 +244,23 @@ describe("Given JokeList", () => {
         user = userEvent.setup();
       });
 
-      it("then keeps focus on the button while trying again", async () => {
-        await user.click(screen.getByRole("button", { name: "Try again" }));
+      describe("when the retry is still loading", () => {
+        beforeEach(async () => {
+          await user.click(screen.getByRole("button", { name: "Try again" }));
+        });
 
-        const button = screen.getByRole("button", { name: "Trying again…" });
-        expect(button).toHaveAttribute("aria-disabled", "true");
-        expect(button).toHaveFocus();
-        await screen.findByRole("button", { name: "Try again" });
+        it("then disables the button", async () => {
+          expect(screen.getByRole("button", { name: "Trying again…" })).toHaveAttribute(
+            "aria-disabled",
+            "true",
+          );
+          await screen.findByRole("button", { name: "Try again" });
+        });
+
+        it("then keeps focus on the button", async () => {
+          expect(screen.getByRole("button", { name: "Trying again…" })).toHaveFocus();
+          await screen.findByRole("button", { name: "Try again" });
+        });
       });
 
       describe("when the API still fails", () => {
@@ -255,12 +275,12 @@ describe("Given JokeList", () => {
 
       describe("when the API recovers", () => {
         beforeEach(async () => {
-          server.resetHandlers();
+          respondWithHappyPath();
           await user.click(screen.getByRole("button", { name: "Try again" }));
         });
 
         it("then shows the jokes", async () => {
-          expect(await screen.findAllByRole("listitem")).toHaveLength(10);
+          expect(await screen.findAllByRole("listitem")).toHaveLength(JOKE_COUNT);
           expect(screen.queryByRole("alert")).not.toBeInTheDocument();
         });
 
