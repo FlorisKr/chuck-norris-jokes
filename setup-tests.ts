@@ -9,6 +9,7 @@ beforeAll(() => {
 afterEach(() => {
   server.resetHandlers();
   resetJokeRequests();
+  localStorage.clear();
 });
 
 afterAll(() => {
