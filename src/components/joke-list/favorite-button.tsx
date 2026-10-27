@@ -1,4 +1,4 @@
-import * as Tooltip from "@radix-ui/react-tooltip";
+import { toast } from "sonner";
 
 import type { Joke } from "../../schemas/joke";
 import { addFavorite, MAX_FAVORITES, removeFavorite, useFavorites } from "../../stores/favorites";
@@ -11,16 +11,18 @@ interface FavoriteButtonProps {
 export function FavoriteButton({ joke }: FavoriteButtonProps) {
   const favorites = useFavorites();
   const isFavorite = favorites.some(({ id }) => id === joke.id);
-  // aria-disabled instead of disabled keeps the button focusable, so its tooltip can explain why it does nothing
+  // aria-disabled instead of disabled keeps the button clickable, so a click or tap can explain the limit
   const isDisabled = !isFavorite && favorites.length >= MAX_FAVORITES;
 
-  const button = (
+  return (
     <button
       type="button"
       aria-pressed={isFavorite}
       aria-disabled={isDisabled}
       onClick={() => {
-        if (isFavorite) {
+        if (isDisabled) {
+          toast(`You already have ${MAX_FAVORITES} favorites`, { id: "favorites-limit" });
+        } else if (isFavorite) {
           removeFavorite(joke.id);
         } else {
           addFavorite(joke);
@@ -31,25 +33,5 @@ export function FavoriteButton({ joke }: FavoriteButtonProps) {
       <HeartIcon filled={isFavorite} />
       <span className="sr-only">Favorite</span>
     </button>
-  );
-
-  // Radix closes a tooltip from its content, so a tooltip without content stays open and pops up at the limit
-  if (!isDisabled) {
-    return button;
-  }
-
-  return (
-    <Tooltip.Root>
-      <Tooltip.Trigger asChild>{button}</Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content
-          side="top"
-          sideOffset={4}
-          className="rounded-md border border-line bg-surface px-2 py-1 text-sm text-foreground shadow-md"
-        >
-          You already have {MAX_FAVORITES} favorites
-        </Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
   );
 }

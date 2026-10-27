@@ -311,21 +311,13 @@ describe("Given JokeList", () => {
       expect(favoriteButtonOf("Joke 2")).toHaveAttribute("aria-disabled", "true");
     });
 
-    describe("when the user hovers the button of another joke", () => {
-      beforeEach(async () => {
-        await user.hover(favoriteButtonOf("Joke 2"));
-      });
-
-      it("then explains the limit in a tooltip", async () => {
-        expect(await screen.findByRole("tooltip")).toHaveTextContent(
-          "You already have 10 favorites",
-        );
-      });
-    });
-
     describe("when the user tries to favorite another joke", () => {
       beforeEach(async () => {
         await user.click(favoriteButtonOf("Joke 2"));
+      });
+
+      it("then explains the limit", async () => {
+        expect(await screen.findByText("You already have 10 favorites")).toBeInTheDocument();
       });
 
       it("then doesn't add it", () => {
