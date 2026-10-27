@@ -3,8 +3,10 @@ import { server } from "./src/mocks/server";
 
 const pendingRequests = new Set<string>();
 
-server.events.on("request:start", ({ requestId }) => {
+server.events.on("request:start", ({ request, requestId }) => {
   pendingRequests.add(requestId);
+  // MSW 2 never ends a cancelled request, so a cancel counts as finished
+  request.signal.addEventListener("abort", () => pendingRequests.delete(requestId));
 });
 
 server.events.on("request:end", ({ requestId }) => {

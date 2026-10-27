@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
 
 import { server } from "../mocks/server";
-import { fetchRandomJokes } from "./jokes";
+import { fetchOneUniqueJoke, fetchRandomJokes } from "./jokes";
 
 const RANDOM_JOKE_URL = "https://api.chucknorris.io/jokes/random";
 
@@ -56,5 +56,31 @@ describe("fetchRandomJokes", () => {
     const result = fetchRandomJokes(3);
 
     await expect(result).rejects.toThrow(/500/);
+  });
+});
+
+describe("fetchOneUniqueJoke", () => {
+  it("returns a joke that isn't excluded", async () => {
+    respondWithJokeIds(["a"]);
+
+    const joke = await fetchOneUniqueJoke(new Set(["b", "c"]));
+
+    expect(joke?.id).toBe("a");
+  });
+
+  it("tries again until it finds a joke that isn't excluded", async () => {
+    respondWithJokeIds(["a", "a", "b"]);
+
+    const joke = await fetchOneUniqueJoke(new Set(["a"]));
+
+    expect(joke?.id).toBe("b");
+  });
+
+  it("returns null when every attempt is excluded", async () => {
+    respondWithJokeIds(["a", "a", "a", "b"]);
+
+    const joke = await fetchOneUniqueJoke(new Set(["a"]));
+
+    expect(joke).toBeNull();
   });
 });

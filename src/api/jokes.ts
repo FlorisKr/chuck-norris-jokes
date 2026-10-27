@@ -1,6 +1,7 @@
 import { type Joke, JokeSchema } from "../schemas/joke";
 
 const RANDOM_JOKE_URL = "https://api.chucknorris.io/jokes/random";
+const MAX_FETCH_ATTEMPTS = 3;
 
 export async function fetchRandomJoke(signal?: AbortSignal): Promise<Joke> {
   const response = await fetch(RANDOM_JOKE_URL, { signal });
@@ -43,4 +44,19 @@ export async function fetchRandomJokes(count: number, signal?: AbortSignal): Pro
   }
 
   return jokes;
+}
+
+/** Returns a joke that is not in `excludedIds` or `null` after `MAX_FETCH_ATTEMPTS` duplicates. */
+export async function fetchOneUniqueJoke(
+  excludedIds: ReadonlySet<string>,
+  signal?: AbortSignal,
+): Promise<Joke | null> {
+  for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt += 1) {
+    const joke = await fetchRandomJoke(signal);
+    if (!excludedIds.has(joke.id)) {
+      return joke;
+    }
+  }
+
+  return null;
 }
