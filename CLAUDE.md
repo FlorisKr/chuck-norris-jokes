@@ -2,12 +2,13 @@
 
 React client for the [Chuck Norris jokes API](https://api.chucknorris.io/).
 
-**Stack**: React 19 with the React Compiler, TypeScript, Vite, Tailwind CSS 4, TanStack Query, TanStack Router, Zod, pnpm. Testing: Vitest + React Testing Library with MSW to fake the API.
+**Stack**: React 19 with the React Compiler, TypeScript, Vite, Tailwind CSS 4, TanStack Query, TanStack Router, Zod, pnpm. Testing: Vitest + React Testing Library with MSW to fake the API, and Playwright for end-to-end tests.
 
 ## Commands
 
 - `pnpm dev`: dev server
 - `pnpm test`: run all tests once (`pnpm test:watch` to keep watching)
+- `pnpm test:e2e`: build the app and run the Playwright tests against it
 - `pnpm format`: format with oxfmt
 - `pnpm lint`: lint with Oxlint (type-aware, accessibility rules)
 - `pnpm typecheck`: type-check
@@ -43,7 +44,8 @@ Run `pnpm format`, `pnpm lint`, `pnpm typecheck` and `pnpm test` once, after all
 
 ## Testing
 
-- Follow the `create-tests` skill in `.claude/skills/create-tests/` for everything about tests.
+- Follow the `create-tests` skill in `.claude/skills/create-tests/` for everything about Vitest tests.
+- End-to-end tests live in `e2e/*.e2e.ts` and run against the production build and the real API. Keep them to a few user flows, because integration tests cover the details.
 - When new behavior has no tests, flag it in the summary. Don't write tests unasked, because the developer decides.
 
 ## Workflow
