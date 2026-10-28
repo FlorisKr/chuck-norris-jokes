@@ -27,6 +27,7 @@
 
 - [ ] Unit tests: New or changed code that needs no fakes is covered in `*.spec.ts(x)`
 - [ ] Integration tests: New or changed code that needs a faked network, timer or browser API is covered in `*.integration.spec.ts(x)`
+- [ ] E2E tests: Critical user flows still work, and `e2e/*.e2e.ts` is updated when a flow changes
 
 ### Documentation
 
