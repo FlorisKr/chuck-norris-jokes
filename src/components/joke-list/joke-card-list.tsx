@@ -1,7 +1,7 @@
 import type { Ref } from "react";
 
 import type { Joke } from "../../schemas/joke";
-import { JokeCard } from "./joke-card";
+import { JokeCard } from "../shared/joke-card";
 
 interface JokeCardListProps {
   jokes: Joke[];

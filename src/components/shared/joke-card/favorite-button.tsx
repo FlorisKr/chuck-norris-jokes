@@ -1,7 +1,12 @@
 import { toast } from "sonner";
 
-import type { Joke } from "../../schemas/joke";
-import { addFavorite, MAX_FAVORITES, removeFavorite, useFavorites } from "../../stores/favorites";
+import type { Joke } from "../../../schemas/joke";
+import {
+  addFavorite,
+  MAX_FAVORITES,
+  removeFavorite,
+  useFavorites,
+} from "../../../stores/favorites";
 import { HeartIcon } from "./heart-icon";
 
 interface FavoriteButtonProps {

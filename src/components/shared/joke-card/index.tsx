@@ -1,4 +1,4 @@
-import type { Joke } from "../../schemas/joke";
+import type { Joke } from "../../../schemas/joke";
 import { FavoriteButton } from "./favorite-button";
 
 interface JokeCardProps {
