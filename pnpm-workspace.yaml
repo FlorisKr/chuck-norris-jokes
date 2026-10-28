@@ -1,5 +1,5 @@
 allowBuilds:
-  esbuild: true
+  esbuild: false
   msw: false
-  workerd: true
+  workerd: false
 saveExact: true
