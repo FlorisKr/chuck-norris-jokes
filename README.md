@@ -12,6 +12,7 @@ A React client for the [Chuck Norris jokes API](https://api.chucknorris.io/).
 - [TanStack Router](https://tanstack.com/router) for routing
 - [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) for unit and integration tests, with [MSW](https://mswjs.io/) to fake the API
 - [Playwright](https://playwright.dev/) for end-to-end tests
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/) to deploy to Cloudflare Workers
 - [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [oxfmt](https://oxc.rs/docs/guide/usage/formatter) for linting and formatting
 
 ## Getting started
@@ -26,6 +27,15 @@ pnpm dev
 ## Git hooks
 
 [Husky](https://typicode.github.io/husky/) installs a `pre-push` hook on `pnpm install`. It runs the format check, lint, type-check and tests, so problems show up before CI runs them on the pull request.
+
+## Releasing
+
+Create a release on GitHub under **Releases → Draft a new release**, with a new tag like `v1.0.0` on `main`. Publishing it starts the Release workflow, which:
+
+1. Checks formatting and lint, runs the tests and builds the app.
+2. Deploys the build to [Cloudflare Workers](https://developers.cloudflare.com/workers/static-assets/).
+
+Pre-releases aren't deployed.
 
 ## Scripts
 
