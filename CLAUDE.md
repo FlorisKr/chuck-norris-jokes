@@ -2,7 +2,7 @@
 
 React client for the [Chuck Norris jokes API](https://api.chucknorris.io/).
 
-**Stack**: React 19 with the React Compiler, TypeScript, Vite, Tailwind CSS 4, TanStack Query, Zod, pnpm. Testing: Vitest + React Testing Library with MSW to fake the API.
+**Stack**: React 19 with the React Compiler, TypeScript, Vite, Tailwind CSS 4, TanStack Query, TanStack Router, Zod, pnpm. Testing: Vitest + React Testing Library with MSW to fake the API.
 
 ## Commands
 
@@ -29,7 +29,8 @@ Run `pnpm format`, `pnpm lint`, `pnpm typecheck` and `pnpm test` once, after all
 
 - Folders by technical layer: `src/schemas` (Zod schema and inferred type), `src/api` (fetching), `src/queries` (TanStack Query options), `src/stores` (client state saved in `localStorage`, read with `useSyncExternalStore`), `src/components`, `src/mocks` (MSW handlers and fixtures), `src/tests` (test helpers).
 - A feature lives in `src/components/<feature>/index.tsx`, with the parts it uses as sibling files and sub-features in their own folder (like `joke-list/auto-refresh/`).
-- Share when actually shared: code moves to a shared place only once a second user needs it.
+- Routes live in `src/router.tsx` (TanStack Router, code-based).
+- Share when actually shared: code moves to `src/components/shared/` only once a second user needs it.
 - File and folder names are kebab-case. Component names stay PascalCase.
 - Components call `useQuery` with the query options directly. No custom hook around it.
 
