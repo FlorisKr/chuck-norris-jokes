@@ -27,7 +27,7 @@ Run `pnpm format`, `pnpm lint`, `pnpm typecheck` and `pnpm test` once, after all
 
 ## Structure
 
-- Folders by technical layer: `src/schemas` (Zod schema and inferred type), `src/api` (fetching), `src/queries` (TanStack Query options), `src/components`, `src/mocks` (MSW handlers and fixtures), `src/tests` (test helpers).
+- Folders by technical layer: `src/schemas` (Zod schema and inferred type), `src/api` (fetching), `src/queries` (TanStack Query options), `src/stores` (client state saved in `localStorage`, read with `useSyncExternalStore`), `src/components`, `src/mocks` (MSW handlers and fixtures), `src/tests` (test helpers).
 - A feature lives in `src/components/<feature>/index.tsx`, with the parts it uses as sibling files and sub-features in their own folder (like `joke-list/auto-refresh/`).
 - Share when actually shared: code moves to a shared place only once a second user needs it.
 - File and folder names are kebab-case. Component names stay PascalCase.
