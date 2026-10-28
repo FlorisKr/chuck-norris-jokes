@@ -8,3 +8,7 @@ dist
 .vscode/*
 !.vscode/extensions.json
 .zed
+
+# Playwright
+/test-results/
+/playwright-report/

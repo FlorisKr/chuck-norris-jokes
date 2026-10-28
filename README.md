@@ -9,7 +9,9 @@ A React client for the [Chuck Norris jokes API](https://api.chucknorris.io/).
 - [Vite](https://vite.dev/)
 - [Tailwind CSS 4](https://tailwindcss.com/)
 - [TanStack Query](https://tanstack.com/query) for data fetching and [Zod](https://zod.dev/) for validating API data
+- [TanStack Router](https://tanstack.com/router) for routing
 - [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) for unit and integration tests, with [MSW](https://mswjs.io/) to fake the API
+- [Playwright](https://playwright.dev/) for end-to-end tests
 - [Oxlint](https://oxc.rs/docs/guide/usage/linter) and [oxfmt](https://oxc.rs/docs/guide/usage/formatter) for linting and formatting
 
 ## Getting started
@@ -36,6 +38,7 @@ pnpm dev
 | `pnpm typecheck`    | Type-check the codebase                        |
 | `pnpm test`         | Run the tests once                             |
 | `pnpm test:watch`   | Run the tests in watch mode                    |
+| `pnpm test:e2e`     | Build the app and run the end-to-end tests     |
 | `pnpm format`       | Format the codebase with oxfmt                 |
 | `pnpm format:check` | Check formatting without writing changes       |
 
@@ -44,6 +47,13 @@ pnpm dev
 Our tests focus on behavior, not implementation: they interact with the app the way a user does.
 
 - **Unit tests** cover pure functions in isolation.
-- **Integration tests** They render a feature and query it by role, label or text. Only browser APIs are faked; the project's own modules are never mocked.
+- **Integration tests** render a feature and query it by role, label or text. Only browser APIs are faked; the project's own modules are never mocked.
 
 Tests live next to the code they test as `*.spec.ts` / `*.integration.spec.tsx` and run with `pnpm test`.
+
+**End-to-end tests** live in `e2e/*.e2e.ts`. They run the production build in Desktop Chrome, Mobile Chrome and Mobile Safari against the real API. Install the browsers once, then run them:
+
+```sh
+pnpm exec playwright install chromium webkit
+pnpm test:e2e
+```
