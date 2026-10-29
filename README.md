@@ -2,6 +2,19 @@
 
 A React client for the [Chuck Norris jokes API](https://api.chucknorris.io/).
 
+**Live:** https://chuck-norris-jokes.floriskr.workers.dev
+
+## Features
+
+| Requirement                                     | Where                                             |
+| ----------------------------------------------- | ------------------------------------------------- |
+| Fetch 10 random jokes on page load              | `src/api/jokes.ts`                                |
+| Timer: a new joke every 5 s, max 10, oldest out | `src/components/joke-list/auto-refresh/`          |
+| Add and remove favorites, max 10                | `src/stores/favorites.ts`                         |
+| Favorites on a separate page                    | `/favorites`, `src/components/favorites/`         |
+| Favorites survive a refresh                     | `localStorage`, validated with Zod on read        |
+| CI/CD that builds and deploys                   | `.github/workflows/`, see [Releasing](#releasing) |
+
 ## Tech stack
 
 - [React 19](https://react.dev/) with the [React Compiler](https://react.dev/learn/react-compiler)
