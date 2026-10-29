@@ -20,7 +20,7 @@ createRoot(document.getElementById("root")!).render(
           unstyled: true,
           classNames: {
             toast:
-              "w-full rounded-xl border border-line bg-surface px-4 py-3 text-foreground shadow-md",
+              "w-full rounded-xl border-1 border-secondary bg-surface px-4 py-3 text-center text-foreground shadow-md",
           },
         }}
       />
