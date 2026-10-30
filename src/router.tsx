@@ -1,9 +1,15 @@
-import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  type RouterHistory,
+} from "@tanstack/react-router";
 
 import { App } from "./app";
 import { Favorites } from "./components/favorites";
 import { JokeList } from "./components/joke-list";
 import { NotFound } from "./components/not-found";
+import { RouteError } from "./components/route-error";
 
 const rootRoute = createRootRoute({ component: App, notFoundComponent: NotFound });
 
@@ -19,9 +25,13 @@ const favoritesRoute = createRoute({
   component: Favorites,
 });
 
-export const routeTree = rootRoute.addChildren([jokesRoute, favoritesRoute]);
+const routeTree = rootRoute.addChildren([jokesRoute, favoritesRoute]);
 
-export const router = createRouter({ routeTree });
+export function createAppRouter(history?: RouterHistory) {
+  return createRouter({ routeTree, history, defaultErrorComponent: RouteError });
+}
+
+export const router = createAppRouter();
 
 declare module "@tanstack/react-router" {
   interface Register {
