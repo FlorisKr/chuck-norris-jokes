@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 
 import { jokesQueryOptions } from "../../queries/jokes";
+import { ErrorState } from "../shared/error-state";
 import { AutoRefresh } from "./auto-refresh";
-import { ErrorState } from "./error-state";
 import { JokeCardList } from "./joke-card-list";
 import { JokeListSkeleton } from "./joke-list-skeleton";
 
